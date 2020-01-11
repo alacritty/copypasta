@@ -1,14 +1,36 @@
-#[cfg(any(not(unix), target_os = "macos", target_os = "android", target_os = "emscripten"))]
+#[cfg(any(
+    not(unix),
+    target_os = "macos",
+    target_os = "android",
+    target_os = "ios",
+    target_os = "emscripten"
+))]
 fn main() {
     unimplemented!()
 }
 
-#[cfg(all(unix, not(any(target_os = "macos", target_os = "android", target_os = "emscripten"))))]
+#[cfg(all(
+    unix,
+    not(any(
+        target_os = "macos",
+        target_os = "android",
+        target_os = "ios",
+        target_os = "emscripten"
+    ))
+))]
 fn main() {
     wayland::main();
 }
 
-#[cfg(all(unix, not(any(target_os = "macos", target_os = "android", target_os = "emscripten"))))]
+#[cfg(all(
+    unix,
+    not(any(
+        target_os = "macos",
+        target_os = "android",
+        target_os = "ios",
+        target_os = "emscripten"
+    ))
+))]
 mod wayland {
     extern crate andrew;
     extern crate copypasta;

@@ -15,11 +15,11 @@ objc = "0.2"
 objc_id = "0.1"
 objc-foundation = "0.1"
 
-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies]
+[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="ios", target_os="emscripten"))))'.dependencies]
 x11-clipboard = "0.4.0"
 smithay-clipboard = "0.3.4"
 wayland-client = { version = "0.23.3", features = ["dlopen"] }
 
-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dev-dependencies]
+[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="ios", target_os="emscripten"))))'.dev-dependencies]
 andrew = "0.2.1"
 smithay-client-toolkit = "0.6.1"
