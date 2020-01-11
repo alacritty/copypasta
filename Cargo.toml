@@ -4,8 +4,11 @@ version = "0.6.2"
 authors = ["Christian Duerr <contact@christianduerr.com>"]
 description = "copypasta is a cross-platform library for getting and setting the contents of the OS-level clipboard."
 repository = "https://github.com/alacritty/copypasta"
+documentation = "https://docs.rs/copypasta"
+readme = "README.md"
 license = "MIT / Apache-2.0"
 keywords = ["clipboard"]
+exclude = ["/.travis.yml"]
 
 [target.'cfg(windows)'.dependencies]
 clipboard-win = "2.2"
