@@ -25,6 +25,7 @@ pub use crate::common::ClipboardProvider;
         target_os = "emscripten"
     ))
 ))]
+#[cfg(feature = "wayland")]
 pub mod wayland_clipboard;
 #[cfg(all(
     unix,
@@ -35,6 +36,7 @@ pub mod wayland_clipboard;
         target_os = "emscripten"
     ))
 ))]
+#[cfg(feature = "x11")]
 pub mod x11_clipboard;
 
 #[cfg(windows)]
@@ -54,6 +56,7 @@ pub mod nop_clipboard;
         target_os = "emscripten"
     ))
 ))]
+#[cfg(feature = "x11")]
 pub type ClipboardContext = x11_clipboard::X11ClipboardContext;
 #[cfg(windows)]
 pub type ClipboardContext = windows_clipboard::WindowsClipboardContext;

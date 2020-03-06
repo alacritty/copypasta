@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.6.2
 
+### Added
+
+- Features `x11` and `wayland` for picking the linux backends
+
 ### Fixed
 
 - Compilation on iOS, using the no-op clipboard

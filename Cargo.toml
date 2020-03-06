@@ -11,6 +11,13 @@ keywords = ["clipboard"]
 exclude = ["/.travis.yml"]
 edition = "2018"
 
+[features]
+default = ["x11", "wayland"]
+
+x11 = ["x11-clipboard"]
+
+wayland = ["smithay-clipboard", "wayland-client"]
+
 [target.'cfg(windows)'.dependencies]
 clipboard-win = "2.2"
 
@@ -20,9 +27,9 @@ objc_id = "0.1"
 objc-foundation = "0.1"
 
 [target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="ios", target_os="emscripten"))))'.dependencies]
-x11-clipboard = "0.5.1"
-smithay-clipboard = "0.3.4"
-wayland-client = { version = "0.23.3", features = ["dlopen"] }
+x11-clipboard = { version = "0.5.1", optional = true }
+smithay-clipboard = { version = "0.3.4", optional = true }
+wayland-client = { version = "0.23.3", features = ["dlopen"], optional = true }
 
 [target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="ios", target_os="emscripten"))))'.dev-dependencies]
 andrew = "0.2.1"
