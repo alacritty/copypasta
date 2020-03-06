@@ -9,6 +9,7 @@ readme = "README.md"
 license = "MIT / Apache-2.0"
 keywords = ["clipboard"]
 exclude = ["/.travis.yml"]
+edition = "2018"
 
 [target.'cfg(windows)'.dependencies]
 clipboard-win = "2.2"

@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common::*;
+use std::error::Error;
+use std::mem::transmute;
+
 use objc::runtime::{Class, Object};
 use objc_foundation::{INSArray, INSObject, INSString};
 use objc_foundation::{NSArray, NSDictionary, NSObject, NSString};
 use objc_id::{Id, Owned};
-use std::error::Error;
-use std::mem::transmute;
+
+use crate::common::*;
 
 pub struct OSXClipboardContext {
     pasteboard: Id<Object>,
