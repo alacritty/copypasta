@@ -21,7 +21,7 @@ use smithay_clipboard::WaylandClipboard;
 use wayland_client::sys::client::wl_display;
 use wayland_client::Display;
 
-use common::ClipboardProvider;
+use crate::common::ClipboardProvider;
 
 pub struct Clipboard {
     context: Arc<Mutex<WaylandClipboard>>,

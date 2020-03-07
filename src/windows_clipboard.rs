@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::error::Error;
+
 use clipboard_win::{get_clipboard_string, set_clipboard_string};
 
-use common::ClipboardProvider;
-use std::error::Error;
+use crate::common::ClipboardProvider;
 
 pub struct WindowsClipboardContext;
 

@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common::*;
 use std::error::Error;
 use std::marker::PhantomData;
 use std::time::Duration;
-use x11_clipboard_crate::xcb::xproto::Atom;
-use x11_clipboard_crate::Atoms;
-use x11_clipboard_crate::Clipboard as X11Clipboard;
+
+use x11_clipboard::xcb::xproto::Atom;
+use x11_clipboard::{Atoms, Clipboard as X11Clipboard};
+
+use crate::common::*;
 
 pub trait Selection: Send {
     fn atom(atoms: &Atoms) -> Atom;

@@ -32,27 +32,22 @@ fn main() {
     ))
 ))]
 mod wayland {
-    extern crate andrew;
-    extern crate copypasta;
-    extern crate smithay_client_toolkit as sctk;
-
-    use wayland::copypasta::wayland_clipboard::create_clipboards;
-    use wayland::copypasta::ClipboardProvider;
-
     use std::io::{Read, Seek, SeekFrom, Write};
     use std::sync::{atomic, Arc, Mutex};
 
-    use wayland::sctk::keyboard::{map_keyboard_auto, Event as KbEvent, KeyState};
-    use wayland::sctk::utils::{DoubleMemPool, MemPool};
-    use wayland::sctk::window::{ConceptFrame, Event as WEvent, Window};
-    use wayland::sctk::Environment;
+    use copypasta::wayland_clipboard::create_clipboards;
+    use copypasta::ClipboardProvider;
 
-    use wayland::sctk::reexports::client::protocol::{wl_shm, wl_surface};
-    use wayland::sctk::reexports::client::{Display, NewProxy};
+    use smithay_client_toolkit::keyboard::{map_keyboard_auto, Event as KbEvent, KeyState};
+    use smithay_client_toolkit::utils::{DoubleMemPool, MemPool};
+    use smithay_client_toolkit::window::{ConceptFrame, Event as WEvent, Window};
+    use smithay_client_toolkit::Environment;
 
-    use wayland::andrew::shapes::rectangle;
-    use wayland::andrew::text;
-    use wayland::andrew::text::fontconfig;
+    use smithay_client_toolkit::reexports::client::protocol::{wl_shm, wl_surface};
+    use smithay_client_toolkit::reexports::client::{Display, NewProxy};
+
+    use andrew::shapes::rectangle;
+    use andrew::text::{self, fontconfig};
 
     pub fn main() {
         let (display, mut event_queue) =
@@ -67,7 +62,7 @@ mod wayland {
         let need_redraw = Arc::new(atomic::AtomicBool::new(false));
         let need_redraw_clone = need_redraw.clone();
         let cb_contents_clone = cb_contents.clone();
-        map_keyboard_auto(&seat, move |event: KbEvent, _| {
+        map_keyboard_auto(&seat, move |event: KbEvent<'_>, _| {
             if let KbEvent::Key { state: KeyState::Pressed, utf8: Some(text), .. } = event {
                 if text == " " {
                     *cb_contents_clone.lock().unwrap() = ctx.get_contents().unwrap();

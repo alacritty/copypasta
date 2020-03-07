@@ -11,56 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#![crate_name = "copypasta"]
-#![crate_type = "lib"]
-#![crate_type = "dylib"]
-#![crate_type = "rlib"]
-
-#[cfg(all(
-    unix,
-    not(any(
-        target_os = "macos",
-        target_os = "android",
-        target_os = "ios",
-        target_os = "emscripten"
-    ))
-))]
-extern crate smithay_clipboard;
-#[cfg(all(
-    unix,
-    not(any(
-        target_os = "macos",
-        target_os = "android",
-        target_os = "ios",
-        target_os = "emscripten"
-    ))
-))]
-extern crate wayland_client;
-#[cfg(all(
-    unix,
-    not(any(
-        target_os = "macos",
-        target_os = "android",
-        target_os = "ios",
-        target_os = "emscripten"
-    ))
-))]
-extern crate x11_clipboard as x11_clipboard_crate;
-
-#[cfg(windows)]
-extern crate clipboard_win;
-
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate objc;
-#[cfg(target_os = "macos")]
-extern crate objc_foundation;
-#[cfg(target_os = "macos")]
-extern crate objc_id;
+#![deny(clippy::all, clippy::if_not_else, clippy::enum_glob_use, clippy::wrong_pub_self_convention)]
 
 mod common;
-pub use common::ClipboardProvider;
+pub use crate::common::ClipboardProvider;
 
 #[cfg(all(
     unix,

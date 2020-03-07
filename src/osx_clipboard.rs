@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use common::*;
+use std::error::Error;
+use std::mem::transmute;
+
 use objc::runtime::{Class, Object};
+use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSObject, INSString};
 use objc_foundation::{NSArray, NSDictionary, NSObject, NSString};
 use objc_id::{Id, Owned};
-use std::error::Error;
-use std::mem::transmute;
+
+use crate::common::*;
 
 pub struct OSXClipboardContext {
     pasteboard: Id<Object>,
@@ -67,11 +70,11 @@ impl ClipboardProvider for OSXClipboardContext {
         let string_array = NSArray::from_vec(vec![NSString::from_str(&data)]);
         let _: usize = unsafe { msg_send![self.pasteboard, clearContents] };
         let success: bool = unsafe { msg_send![self.pasteboard, writeObjects: string_array] };
-        return if success {
+        if success {
             Ok(())
         } else {
             Err("NSPasteboard#writeObjects: returned false".into())
-        };
+        }
     }
 }
 
