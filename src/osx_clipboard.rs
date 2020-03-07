@@ -15,8 +15,8 @@
 use std::error::Error;
 use std::mem::transmute;
 
-use objc::{sel, sel_impl, msg_send};
 use objc::runtime::{Class, Object};
+use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSObject, INSString};
 use objc_foundation::{NSArray, NSDictionary, NSObject, NSString};
 use objc_id::{Id, Owned};
