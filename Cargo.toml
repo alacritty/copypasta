@@ -13,9 +13,7 @@ edition = "2018"
 
 [features]
 default = ["x11", "wayland"]
-
 x11 = ["x11-clipboard"]
-
 wayland = ["smithay-clipboard", "wayland-client"]
 
 [target.'cfg(windows)'.dependencies]
