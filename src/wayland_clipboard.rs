@@ -52,7 +52,7 @@ pub unsafe fn create_clipboards_from_external(display: *mut c_void) -> (Primary,
 
 impl ClipboardProvider for Clipboard {
     fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
-        Ok(self.context.lock().unwrap().load(None))
+        Ok(self.context.lock().unwrap().load(None)?)
     }
 
     fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
@@ -64,7 +64,7 @@ impl ClipboardProvider for Clipboard {
 
 impl ClipboardProvider for Primary {
     fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
-        Ok(self.context.lock().unwrap().load_primary(None))
+        Ok(self.context.lock().unwrap().load_primary(None)?)
     }
 
     fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
