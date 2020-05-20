@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Ability to create a Wayland clipboard from Display type directly using `create_clipboard`
-- Example for Wayland clipboard
 
 ## 0.6.3
 
