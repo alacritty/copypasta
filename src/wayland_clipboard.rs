@@ -16,10 +16,7 @@ use std::error::Error;
 use std::ffi::c_void;
 use std::sync::{Arc, Mutex};
 
-use smithay_clipboard::WaylandClipboard;
-
-use wayland_client::sys::client::wl_display;
-use wayland_client::Display;
+use smithay_clipboard::Clipboard as WaylandClipboard;
 
 use crate::common::ClipboardProvider;
 
@@ -31,12 +28,6 @@ pub struct Primary {
     context: Arc<Mutex<WaylandClipboard>>,
 }
 
-pub fn create_clipboards(display: &Display) -> (Primary, Clipboard) {
-    let context = Arc::new(Mutex::new(WaylandClipboard::new(display)));
-
-    (Primary { context: context.clone() }, Clipboard { context })
-}
-
 /// Create new clipboard from a raw display pointer.
 ///
 /// # Safety
@@ -44,19 +35,18 @@ pub fn create_clipboards(display: &Display) -> (Primary, Clipboard) {
 /// Since the type of the display is a raw pointer, it's the responsibility of the callee to make
 /// sure that the passed pointer is a valid Wayland display.
 pub unsafe fn create_clipboards_from_external(display: *mut c_void) -> (Primary, Clipboard) {
-    let context =
-        Arc::new(Mutex::new(WaylandClipboard::new_from_external(display as *mut wl_display)));
+    let context = Arc::new(Mutex::new(WaylandClipboard::new(display)));
 
     (Primary { context: context.clone() }, Clipboard { context })
 }
 
 impl ClipboardProvider for Clipboard {
     fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
-        Ok(self.context.lock().unwrap().load(None)?)
+        Ok(self.context.lock().unwrap().load()?)
     }
 
     fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
-        self.context.lock().unwrap().store(None, data);
+        self.context.lock().unwrap().store(data);
 
         Ok(())
     }
@@ -64,11 +54,11 @@ impl ClipboardProvider for Clipboard {
 
 impl ClipboardProvider for Primary {
     fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
-        Ok(self.context.lock().unwrap().load_primary(None)?)
+        Ok(self.context.lock().unwrap().load_primary()?)
     }
 
     fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
-        self.context.lock().unwrap().store_primary(None, data);
+        self.context.lock().unwrap().store_primary(data);
 
         Ok(())
     }
