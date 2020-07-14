@@ -14,11 +14,13 @@
 
 use std::error::Error;
 
+pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
+
 // TODO: come up with some platform-agnostic API for richer types
 /// Trait for clipboard access
 pub trait ClipboardProvider: Send {
     /// Method to get the clipboard contents as a String
-    fn get_contents(&mut self) -> Result<String, Box<dyn Error>>;
+    fn get_contents(&mut self) -> Result<String>;
     /// Method to set the clipboard contents as a String
-    fn set_contents(&mut self, _: String) -> Result<(), Box<dyn Error>>;
+    fn set_contents(&mut self, _: String) -> Result<()>;
 }
