@@ -14,7 +14,7 @@
 
 use std::error::Error;
 
-pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
+pub type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync + 'static>>;
 
 // TODO: come up with some platform-agnostic API for richer types
 /// Trait for clipboard access
