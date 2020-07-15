@@ -32,7 +32,7 @@ pub struct OSXClipboardContext {
 extern "C" {}
 
 impl OSXClipboardContext {
-    pub fn new() -> Result<OSXClipboardContext, Box<dyn Error>> {
+    pub fn new() -> Result<OSXClipboardContext> {
         let cls = Class::get("NSPasteboard").ok_or("Class::get(\"NSPasteboard\")")?;
         let pasteboard: *mut Object = unsafe { msg_send![cls, generalPasteboard] };
         if pasteboard.is_null() {
@@ -44,7 +44,7 @@ impl OSXClipboardContext {
 }
 
 impl ClipboardProvider for OSXClipboardContext {
-    fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
+    fn get_contents(&mut self) -> Result<String> {
         let string_class: Id<NSObject> = {
             let cls: Id<Class> = unsafe { Id::from_ptr(class("NSString")) };
             unsafe { transmute(cls) }
@@ -66,7 +66,7 @@ impl ClipboardProvider for OSXClipboardContext {
         }
     }
 
-    fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
+    fn set_contents(&mut self, data: String) -> Result<()> {
         let string_array = NSArray::from_vec(vec![NSString::from_str(&data)]);
         let _: usize = unsafe { msg_send![self.pasteboard, clearContents] };
         let success: bool = unsafe { msg_send![self.pasteboard, writeObjects: string_array] };

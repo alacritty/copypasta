@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::error::Error;
 use std::ffi::c_void;
 use std::sync::{Arc, Mutex};
 
 use smithay_clipboard::Clipboard as WaylandClipboard;
 
-use crate::common::ClipboardProvider;
+use crate::common::{ClipboardProvider, Result};
 
 pub struct Clipboard {
     context: Arc<Mutex<WaylandClipboard>>,
@@ -41,11 +40,11 @@ pub unsafe fn create_clipboards_from_external(display: *mut c_void) -> (Primary,
 }
 
 impl ClipboardProvider for Clipboard {
-    fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
+    fn get_contents(&mut self) -> Result<String> {
         Ok(self.context.lock().unwrap().load()?)
     }
 
-    fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
+    fn set_contents(&mut self, data: String) -> Result<()> {
         self.context.lock().unwrap().store(data);
 
         Ok(())
@@ -53,11 +52,11 @@ impl ClipboardProvider for Clipboard {
 }
 
 impl ClipboardProvider for Primary {
-    fn get_contents(&mut self) -> Result<String, Box<dyn Error>> {
+    fn get_contents(&mut self) -> Result<String> {
         Ok(self.context.lock().unwrap().load_primary()?)
     }
 
-    fn set_contents(&mut self, data: String) -> Result<(), Box<dyn Error>> {
+    fn set_contents(&mut self, data: String) -> Result<()> {
         self.context.lock().unwrap().store_primary(data);
 
         Ok(())
