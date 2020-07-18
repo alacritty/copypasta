@@ -1,4 +1,7 @@
 image: freebsd/latest
+packages:
+  - lang/python3
+  - x11/libxcb
 sources:
   - https://github.com/alacritty/copypasta
 tasks:
