@@ -2,6 +2,7 @@ image: freebsd/latest
 packages:
   - lang/python3
   - x11/libxcb
+  - x11/libXfixes
 sources:
   - https://github.com/alacritty/copypasta
 tasks:
