@@ -1,8 +1,9 @@
 image: freebsd/latest
 packages:
+  - devel/cmake
+  - devel/pkgconf
   - lang/python3
   - x11/libxcb
-  - x11/libXfixes
 sources:
   - https://github.com/alacritty/copypasta
 tasks:
