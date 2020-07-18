@@ -1,0 +1,13 @@
+image: freebsd/latest
+sources:
+  - https://github.com/alacritty/copypasta
+tasks:
+  - rustup: |
+      curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable --profile minimal
+  - 1-41-0: |
+      $HOME/.cargo/bin/rustup toolchain install --profile minimal 1.41.0
+      cd copypasta
+      $HOME/.cargo/bin/cargo +1.41.0 test
+  - stable: |
+      cd copypasta
+      $HOME/.cargo/bin/cargo +stable test
