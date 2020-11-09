@@ -22,7 +22,7 @@ tasks:
   - clippy: |
       cd copypasta
       rustup component add clippy
-      cargo clippy --all-targets
+      cargo clippy
   - oldstable: |
       cd copypasta
       rustup toolchain install --profile minimal 1.43.1
