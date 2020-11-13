@@ -2,6 +2,7 @@ image: freebsd/latest
 
 packages:
   - lang/python3
+  - lang/gcc
   - x11/libxcb
 
 sources:
@@ -9,6 +10,7 @@ sources:
 
 environment:
   PATH: /home/build/.cargo/bin:/bin:/usr/bin:/usr/local/bin
+  RUSTFLAGS: -L /usr/local/lib
 
 tasks:
   - rustup: |
