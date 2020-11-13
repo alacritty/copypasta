@@ -1,16 +1,13 @@
-image: freebsd/latest
+image: archlinux
 
 packages:
-  - lang/python3
-  - lang/gcc
-  - x11/libxcb
+  - libxcb
 
 sources:
   - https://github.com/alacritty/copypasta
 
 environment:
-  PATH: /home/build/.cargo/bin:/bin:/usr/bin:/usr/local/bin
-  RUSTFLAGS: -L /usr/local/lib
+  PATH: /home/build/.cargo/bin:/usr/bin/
 
 tasks:
   - rustup: |
@@ -18,6 +15,10 @@ tasks:
   - test: |
       cd copypasta
       cargo test
+  - rustfmt: |
+      cd copypasta
+      rustup toolchain install nightly -c rustfmt
+      cargo +nightly fmt -- --check
   - clippy: |
       cd copypasta
       rustup component add clippy
