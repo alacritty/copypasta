@@ -9,9 +9,9 @@ rust-clipboard is a cross-platform library for getting and setting the contents 
 ```rust
 extern crate copypasta;
 
-use copypasta::ClipboardContext;
+use copypasta::{ClipboardContext, ClipboardProvider};
 
-fn example() {
+fn main() {
     let mut ctx = ClipboardContext::new().unwrap();
     println!("{:?}", ctx.get_contents());
     ctx.set_contents("some string".to_owned()).unwrap();

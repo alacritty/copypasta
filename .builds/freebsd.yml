@@ -4,6 +4,7 @@ packages:
   - lang/python3
   - lang/gcc
   - x11/libxcb
+  - x11/libxkbcommon
 
 sources:
   - https://github.com/alacritty/copypasta
