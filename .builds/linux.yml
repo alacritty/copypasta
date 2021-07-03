@@ -2,6 +2,7 @@ image: archlinux
 
 packages:
   - libxcb
+  - libxkbcommon
 
 sources:
   - https://github.com/alacritty/copypasta
