@@ -25,7 +25,7 @@ pub struct OSXClipboardContext {
 }
 
 #[allow(non_upper_case_globals)]
-static NSUTF8StringEncoding: usize = 4; //apple documentation says it is 4
+static NSUTF8StringEncoding: usize = 4; // apple documentation says it is 4
 
 // required to bring NSPasteboard into the path of the class-resolver
 #[link(name = "AppKit", kind = "framework")]
@@ -73,7 +73,7 @@ fn nsstring_to_rust_string(nsstring: *mut NSString) -> Result<String> {
     unsafe {
         let string_size: usize =
             msg_send![nsstring, lengthOfBytesUsingEncoding: NSUTF8StringEncoding];
-        //we need +1 because getCString will return null terminated string
+        // we need +1 because getCString will return null terminated string
         let char_ptr = libc::malloc(string_size + 1);
         let res: bool = msg_send![nsstring, getCString:char_ptr  maxLength:string_size + 1 encoding:NSUTF8StringEncoding];
         if res {
