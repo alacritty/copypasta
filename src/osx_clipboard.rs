@@ -57,6 +57,7 @@ impl ClipboardProvider for OSXClipboardContext {
             Ok(res)
         }
     }
+
     fn set_contents(&mut self, data: String) -> Result<()> {
         let string_array = NSArray::from_vec(vec![NSString::from_str(&data)]);
         let _: usize = unsafe { msg_send![self.pasteboard, clearContents] };
