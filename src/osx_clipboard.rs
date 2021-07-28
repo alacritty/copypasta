@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use crate::common::*;
-use objc::{msg_send, sel, sel_impl};
 use objc::runtime::{Class, Object, Sel};
+use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
 use objc_id::Id;
@@ -41,7 +41,7 @@ impl OSXClipboardContext {
             return Err("NSPasteboard#generalPasteboard returned null".into());
         }
         let pasteboard: Id<Object> = unsafe { Id::from_ptr(pasteboard) };
-        Ok(OSXClipboardContext {pasteboard})
+        Ok(OSXClipboardContext { pasteboard })
     }
 }
 
