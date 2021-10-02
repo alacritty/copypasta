@@ -66,19 +66,15 @@ impl ClipboardProvider for OSXClipboardContext {
     }
 }
 
-
-/**
-Function that converts NSString to rust string through CString to prevent a memory leak.
-
-encoding:
-   4 = NSUTF8StringEncoding
-   https://developer.apple.com/documentation/foundation/1497293-string_encodings/nsutf8stringencoding?language=objc
-
-getCString:
-   Converts the string to a given encoding and stores it in a buffer.
-   https://developer.apple.com/documentation/foundation/nsstring/1415702-getcstring
-
-*/
+/// Function that converts NSString to rust string through CString to prevent a memory leak.
+///
+/// encoding:
+/// 4 = NSUTF8StringEncoding
+/// https://developer.apple.com/documentation/foundation/1497293-string_encodings/nsutf8stringencoding?language=objc
+///
+/// getCString:
+/// Converts the string to a given encoding and stores it in a buffer.
+/// https://developer.apple.com/documentation/foundation/nsstring/1415702-getcstring
 fn nsstring_to_rust_string(nsstring: *mut NSString) -> String {
     let string_size: usize = unsafe { msg_send![nsstring, lengthOfBytesUsingEncoding: 4] };
     let mut buffer: Vec<u8> = vec![0_u8; string_size + 1];
@@ -90,12 +86,7 @@ fn nsstring_to_rust_string(nsstring: *mut NSString) -> String {
         // nul termination from the buffer should be removed by hands
         buffer.pop();
 
-        unsafe {
-            CString::from_vec_unchecked(buffer)
-                .to_str()
-                .unwrap()
-                .to_string()
-        }
+        unsafe { CString::from_vec_unchecked(buffer).to_str().unwrap().to_string() }
     } else {
         // In case getCString failed there is no point in creating CString
         // Original NSString::as_str() swallows all the errors.
