@@ -18,14 +18,11 @@ use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
 use objc_id::Id;
-use std::ffi::CStr;
+use std::ffi::CString;
 
 pub struct OSXClipboardContext {
     pasteboard: Id<Object>,
 }
-
-#[allow(non_upper_case_globals)]
-static NSUTF8StringEncoding: usize = 4; // apple documentation says it is 4
 
 // required to bring NSPasteboard into the path of the class-resolver
 #[link(name = "AppKit", kind = "framework")]
@@ -52,8 +49,7 @@ impl ClipboardProvider for OSXClipboardContext {
         if string.is_null() {
             Err("pasteboard#stringForType returned null".into())
         } else {
-            let res: String = nsstring_to_rust_string(string).unwrap();
-            let _: () = unsafe { msg_send![string, release] };
+            let res: String = nsstring_to_rust_string(string);
             Ok(res)
         }
     }
@@ -70,20 +66,40 @@ impl ClipboardProvider for OSXClipboardContext {
     }
 }
 
-fn nsstring_to_rust_string(nsstring: *mut NSString) -> Result<String> {
-    unsafe {
-        let string_size: usize =
-            msg_send![nsstring, lengthOfBytesUsingEncoding: NSUTF8StringEncoding];
-        // we need +1 because getCString will return null terminated string
-        let char_ptr = libc::malloc(string_size + 1);
-        let res: bool = msg_send![nsstring, getCString:char_ptr  maxLength:string_size + 1 encoding:NSUTF8StringEncoding];
-        if res {
-            let c_string = CStr::from_ptr(char_ptr as *const i8);
-            libc::free(char_ptr);
-            Ok(c_string.to_string_lossy().into_owned())
-        } else {
-            libc::free(char_ptr);
-            Err("Casting from NSString to Rust string has failed".into())
+
+/**
+Function that converts NSString to rust string through CString to prevent a memory leak.
+
+encoding:
+   4 = NSUTF8StringEncoding
+   https://developer.apple.com/documentation/foundation/1497293-string_encodings/nsutf8stringencoding?language=objc
+
+getCString:
+   Converts the string to a given encoding and stores it in a buffer.
+   https://developer.apple.com/documentation/foundation/nsstring/1415702-getcstring
+
+*/
+fn nsstring_to_rust_string(nsstring: *mut NSString) -> String {
+    let string_size: usize = unsafe { msg_send![nsstring, lengthOfBytesUsingEncoding: 4] };
+    let mut buffer: Vec<u8> = vec![0_u8; string_size + 1];
+    let is_success: bool = unsafe {
+        msg_send![nsstring, getCString:buffer.as_mut_ptr()  maxLength:string_size+1 encoding:4]
+    };
+    if is_success {
+        // before from_vec_with_nul can be used https://github.com/rust-lang/rust/pull/89292
+        // nul termination from the buffer should be removed by hands
+        buffer.pop();
+
+        unsafe {
+            CString::from_vec_unchecked(buffer)
+                .to_str()
+                .unwrap()
+                .to_string()
         }
+    } else {
+        // In case getCString failed there is no point in creating CString
+        // Original NSString::as_str() swallows all the errors.
+        // Not sure if that is the correct approach, but we also don`t have errors here.
+        "".to_string()
     }
 }
