@@ -49,14 +49,13 @@ impl ClipboardProvider for OSXClipboardContext {
         if string.is_null() {
             Err("pasteboard#stringForType returned null".into())
         } else {
-            let res: String = nsstring_to_rust_string(string);
-            Ok(res)
+            Ok(nsstring_to_rust_string(unsafe { Id::from_retained_ptr(string) }))
         }
     }
 
     fn set_contents(&mut self, data: String) -> Result<()> {
         let string_array = NSArray::from_vec(vec![NSString::from_str(&data)]);
-        let _: usize = unsafe { msg_send![self.pasteboard, clearContents] };
+        let _: () = unsafe { msg_send![self.pasteboard, clearContents] };
         let success: bool = unsafe { msg_send![self.pasteboard, writeObjects: string_array] };
         if success {
             Ok(())
@@ -75,7 +74,7 @@ impl ClipboardProvider for OSXClipboardContext {
 /// getCString:
 /// Converts the string to a given encoding and stores it in a buffer.
 /// https://developer.apple.com/documentation/foundation/nsstring/1415702-getcstring
-fn nsstring_to_rust_string(nsstring: *mut NSString) -> String {
+fn nsstring_to_rust_string(nsstring: Id<NSString>) -> String {
     let string_size: usize = unsafe { msg_send![nsstring, lengthOfBytesUsingEncoding: 4] };
     let mut buffer: Vec<u8> = vec![0_u8; string_size + 1];
     let is_success: bool = unsafe {
