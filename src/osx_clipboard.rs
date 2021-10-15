@@ -13,12 +13,12 @@
 // limitations under the License.
 
 use crate::common::*;
+use objc::rc::autoreleasepool;
 use objc::runtime::{Class, Object, Sel};
 use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
 use objc_id::Id;
-use std::ffi::CString;
 
 pub struct OSXClipboardContext {
     pasteboard: Id<Object>,
@@ -44,12 +44,13 @@ impl OSXClipboardContext {
 
 impl ClipboardProvider for OSXClipboardContext {
     fn get_contents(&mut self) -> Result<String> {
-        let string: *mut NSString =
+        let nsstring: *mut NSString =
             unsafe { msg_send![self.pasteboard, stringForType: NSPasteboardTypeString] };
-        if string.is_null() {
+        if nsstring.is_null() {
             Err("pasteboard#stringForType returned null".into())
         } else {
-            Ok(nsstring_to_rust_string(unsafe { Id::from_retained_ptr(string) }))
+            let nsstring: Id<NSString> = unsafe { Id::from_retained_ptr(nsstring) };
+            Ok(autoreleasepool(|| nsstring.as_str().to_owned()))
         }
     }
 
@@ -62,34 +63,5 @@ impl ClipboardProvider for OSXClipboardContext {
         } else {
             Err("NSPasteboard#writeObjects: returned false".into())
         }
-    }
-}
-
-/// Function that converts NSString to rust string through CString to prevent a memory leak.
-///
-/// encoding:
-/// 4 = NSUTF8StringEncoding
-/// https://developer.apple.com/documentation/foundation/1497293-string_encodings/nsutf8stringencoding?language=objc
-///
-/// getCString:
-/// Converts the string to a given encoding and stores it in a buffer.
-/// https://developer.apple.com/documentation/foundation/nsstring/1415702-getcstring
-fn nsstring_to_rust_string(nsstring: Id<NSString>) -> String {
-    let string_size: usize = unsafe { msg_send![nsstring, lengthOfBytesUsingEncoding: 4] };
-    let mut buffer: Vec<u8> = vec![0_u8; string_size + 1];
-    let is_success: bool = unsafe {
-        msg_send![nsstring, getCString:buffer.as_mut_ptr()  maxLength:string_size+1 encoding:4]
-    };
-    if is_success {
-        // before from_vec_with_nul can be used https://github.com/rust-lang/rust/pull/89292
-        // nul termination from the buffer should be removed by hands
-        buffer.pop();
-
-        unsafe { CString::from_vec_unchecked(buffer).to_str().unwrap().to_string() }
-    } else {
-        // In case getCString failed there is no point in creating CString
-        // Original NSString::as_str() swallows all the errors.
-        // Not sure if that is the correct approach, but we also don`t have errors here.
-        "".to_string()
     }
 }
