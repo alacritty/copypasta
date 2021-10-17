@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::common::*;
 use objc::rc::autoreleasepool;
+
 use objc::runtime::{Class, Object, Sel};
 use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
 use objc_id::Id;
+
+use crate::common::*;
 
 pub struct OSXClipboardContext {
     pasteboard: Id<Object>,
@@ -56,7 +58,7 @@ impl ClipboardProvider for OSXClipboardContext {
 
     fn set_contents(&mut self, data: String) -> Result<()> {
         let string_array = NSArray::from_vec(vec![NSString::from_str(&data)]);
-        let _: () = unsafe { msg_send![self.pasteboard, clearContents] };
+        let _: usize = unsafe { msg_send![self.pasteboard, clearContents] };
         let success: bool = unsafe { msg_send![self.pasteboard, writeObjects: string_array] };
         if success {
             Ok(())
