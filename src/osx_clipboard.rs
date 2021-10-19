@@ -13,13 +13,11 @@
 // limitations under the License.
 
 use objc::rc::autoreleasepool;
-
 use objc::runtime::{Class, Object, Sel};
 use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
 use objc_id::Id;
-
 use crate::common::*;
 
 pub struct OSXClipboardContext {
