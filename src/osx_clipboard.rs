@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::mem::transmute;
-
-use objc::runtime::{Class, Object};
+use objc::rc::autoreleasepool;
+use objc::runtime::{Class, Object, Sel};
 use objc::{msg_send, sel, sel_impl};
-use objc_foundation::{INSArray, INSObject, INSString};
-use objc_foundation::{NSArray, NSDictionary, NSObject, NSString};
-use objc_id::{Id, Owned};
+use objc_foundation::{INSArray, INSString};
+use objc_foundation::{NSArray, NSString};
+use objc_id::Id;
 
 use crate::common::*;
 
@@ -28,7 +27,9 @@ pub struct OSXClipboardContext {
 
 // required to bring NSPasteboard into the path of the class-resolver
 #[link(name = "AppKit", kind = "framework")]
-extern "C" {}
+extern "C" {
+    pub static NSPasteboardTypeString: Sel;
+}
 
 impl OSXClipboardContext {
     pub fn new() -> Result<OSXClipboardContext> {
@@ -44,24 +45,13 @@ impl OSXClipboardContext {
 
 impl ClipboardProvider for OSXClipboardContext {
     fn get_contents(&mut self) -> Result<String> {
-        let string_class: Id<NSObject> = {
-            let cls: Id<Class> = unsafe { Id::from_ptr(class("NSString")) };
-            unsafe { transmute(cls) }
-        };
-        let classes: Id<NSArray<NSObject, Owned>> = NSArray::from_vec(vec![string_class]);
-        let options: Id<NSDictionary<NSObject, NSObject>> = NSDictionary::new();
-        let string_array: Id<NSArray<NSString>> = unsafe {
-            let obj: *mut NSArray<NSString> =
-                msg_send![self.pasteboard, readObjectsForClasses:&*classes options:&*options];
-            if obj.is_null() {
-                return Err("pasteboard#readObjectsForClasses:options: returned null".into());
-            }
-            Id::from_ptr(obj)
-        };
-        if string_array.count() == 0 {
-            Err("pasteboard#readObjectsForClasses:options: returned empty".into())
+        let nsstring: *mut NSString =
+            unsafe { msg_send![self.pasteboard, stringForType: NSPasteboardTypeString] };
+        if nsstring.is_null() {
+            Err("pasteboard#stringForType returned null".into())
         } else {
-            Ok(string_array[0].as_str().to_owned())
+            let nsstring: Id<NSString> = unsafe { Id::from_retained_ptr(nsstring) };
+            Ok(autoreleasepool(|| nsstring.as_str().to_owned()))
         }
     }
 
@@ -75,12 +65,4 @@ impl ClipboardProvider for OSXClipboardContext {
             Err("NSPasteboard#writeObjects: returned false".into())
         }
     }
-}
-
-// this is a convenience function that both cocoa-rs and
-//  glutin define, which seems to depend on the fact that
-//  Option::None has the same representation as a null pointer
-#[inline]
-pub fn class(name: &str) -> *mut Class {
-    unsafe { transmute(Class::get(name)) }
 }
