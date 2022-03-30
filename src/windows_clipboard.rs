@@ -16,7 +16,6 @@ use clipboard_win::{get_clipboard_string, set_clipboard_string};
 use std::io::ErrorKind;
 use std::io::Error;
 use crate::common;
-// use std::error::Error;
 
 pub struct WindowsClipboardContext;
 
@@ -41,5 +40,5 @@ impl common::ClipboardProvider for WindowsClipboardContext {
         } else {
             Err(Box::new(Error::new(ErrorKind::Other, "unable to set clipboard")))
         }
-    }world
+    }
 }
