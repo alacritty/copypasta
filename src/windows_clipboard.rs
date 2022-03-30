@@ -13,23 +13,33 @@
 // limitations under the License.
 
 use clipboard_win::{get_clipboard_string, set_clipboard_string};
-
-use crate::common::{ClipboardProvider, Result};
+use std::io::ErrorKind;
+use std::io::Error;
+use crate::common;
+// use std::error::Error;
 
 pub struct WindowsClipboardContext;
 
 impl WindowsClipboardContext {
-    pub fn new() -> Result<Self> {
+    pub fn new() -> common::Result<Self> {
         Ok(WindowsClipboardContext)
     }
 }
 
-impl ClipboardProvider for WindowsClipboardContext {
-    fn get_contents(&mut self) -> Result<String> {
-        Ok(get_clipboard_string()?)
+impl common::ClipboardProvider for WindowsClipboardContext {
+    fn get_contents(&mut self) -> common::Result<String> {
+        if let Ok(data) = get_clipboard_string() {
+            Ok(data)
+        } else {
+            Err(Box::new(Error::new(ErrorKind::Other, "unable to get clipboard")))
+        }
     }
 
-    fn set_contents(&mut self, data: String) -> Result<()> {
-        Ok(set_clipboard_string(&data)?)
-    }
+    fn set_contents(&mut self, data: String) -> common::Result<()> {
+        if let Ok(_) = set_clipboard_string(&data) {
+            Ok(())
+        } else {
+            Err(Box::new(Error::new(ErrorKind::Other, "unable to set clipboard")))
+        }
+    }world
 }
