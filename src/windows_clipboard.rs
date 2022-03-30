@@ -35,7 +35,7 @@ impl common::ClipboardProvider for WindowsClipboardContext {
     }
 
     fn set_contents(&mut self, data: String) -> common::Result<()> {
-        if let Ok(_) = set_clipboard_string(&data) {
+        if set_clipboard_string(&data).is_ok() {
             Ok(())
         } else {
             Err(Box::new(Error::new(ErrorKind::Other, "unable to set clipboard")))
