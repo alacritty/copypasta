@@ -22,35 +22,23 @@ impl ClipboardProvider for AndroidClipboardContext {
             .unwrap();
 
         let clip_data = env
-            .call_method(
-                cb_manager,
-                "getPrimaryClip",
-                "()Landroid/content/ClipData;",
-                &[],
-            )?
+            .call_method(cb_manager, "getPrimaryClip", "()Landroid/content/ClipData;", &[])?
             .l()
             .unwrap();
 
-        //return Ok(format!("{:?}", clip_data));
+        // return Ok(format!("{:?}", clip_data));
 
         let item = env
-            .call_method(
-                clip_data,
-                "getItemAt",
-                "(I)Landroid/content/ClipData$Item;",
-                &[0i32.into()],
-            )?
+            .call_method(clip_data, "getItemAt", "(I)Landroid/content/ClipData$Item;", &[
+                0i32.into()
+            ])?
             .l()
             .unwrap();
 
-        let char_seq = env
-            .call_method(item, "getText", "()Ljava/lang/CharSequence;", &[])?
-            .l()?;
+        let char_seq = env.call_method(item, "getText", "()Ljava/lang/CharSequence;", &[])?.l()?;
 
-        let string = env
-            .call_method(char_seq, "toString", "()Ljava/lang/String;", &[])?
-            .l()
-            .unwrap();
+        let string =
+            env.call_method(char_seq, "toString", "()Ljava/lang/String;", &[])?.l().unwrap();
 
         let jstring = JString::from(string.into_inner());
 
@@ -85,18 +73,12 @@ impl ClipboardProvider for AndroidClipboardContext {
             class_clip_data,
             "newPlainText",
             "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Landroid/content/ClipData;",
-            &[
-                env.new_string("text").unwrap().into(),
-                env.new_string(text).unwrap().into(),
-            ],
+            &[env.new_string("text").unwrap().into(), env.new_string(text).unwrap().into()],
         )?;
 
-        env.call_method(
-            cb_manager,
-            "setPrimaryClip",
-            "(Landroid/content/ClipData;)V",
-            &[clip_data],
-        )?
+        env.call_method(cb_manager, "setPrimaryClip", "(Landroid/content/ClipData;)V", &[
+            clip_data,
+        ])?
         .v()?;
 
         Ok(())
