@@ -103,9 +103,9 @@ impl ClipboardProvider for AndroidClipboardContext {
     }
 }
 
-impl AndroidClipboardContext{
+impl AndroidClipboardContext {
     #[inline]
-    pub fn new() -> Result<Self>{
+    pub fn new() -> Result<Self> {
         Ok(AndroidClipboardContext)
     }
 }
