@@ -2,8 +2,10 @@ use copypasta::{ClipboardContext, ClipboardProvider};
 
 fn main() {
     let mut ctx = ClipboardContext::new().unwrap();
+    let msg = "Hello, world!";
+    ctx.set_contents(msg.to_owned()).unwrap();
 
-    let the_string = "Hello, world!";
+    let found = ctx.get_contents().unwrap();
 
-    ctx.set_contents(the_string.to_owned()).unwrap();
+    println!("{}", &found);
 }
