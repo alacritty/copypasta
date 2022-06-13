@@ -5,7 +5,7 @@ fn main() {
     let msg = "Hello, world!";
     ctx.set_contents(msg.to_owned()).unwrap();
 
-    let found = ctx.get_contents().unwrap();
+    let content = ctx.get_contents().unwrap();
 
-    println!("{}", &found);
+    println!("{}", content);
 }
