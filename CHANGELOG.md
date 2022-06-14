@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Unreleased
 
-- Minumun rust version was bumped to `1.56.0`
+- Minumun rust version was bumped to `1.57.0`
 
 ## 0.7.1
 
