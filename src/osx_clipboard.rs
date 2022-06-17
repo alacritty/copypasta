@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use objc::rc::autoreleasepool;
-use objc::runtime::{Class, Object, Sel};
+use objc::runtime::{Class, Object, Sel, BOOL, NO};
 use objc::{msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
@@ -45,14 +45,23 @@ impl OSXClipboardContext {
 
 impl ClipboardProvider for OSXClipboardContext {
     fn get_contents(&mut self) -> Result<String> {
-        let nsstring: *mut NSString =
-            unsafe { msg_send![self.pasteboard, stringForType: NSPasteboardTypeString] };
-        if nsstring.is_null() {
-            Err("pasteboard#stringForType returned null".into())
-        } else {
-            let nsstring: Id<NSString> = unsafe { Id::from_retained_ptr(nsstring) };
-            Ok(autoreleasepool(|| nsstring.as_str().to_owned()))
-        }
+        autoreleasepool(|| unsafe {
+            let types: *mut NSArray<*mut NSString> = msg_send![self.pasteboard, types];
+            let has_str: BOOL = msg_send![types, containsObject: NSPasteboardTypeString];
+
+            if has_str == NO {
+                return Err("NSPasteboard#types doesn't contain NSPasteboardTypeString".into());
+            }
+
+            let text: *mut NSString =
+                msg_send![self.pasteboard, stringForType: NSPasteboardTypeString];
+
+            if text.is_null() {
+                return Err(("NSPasteboard#stringForType returned null").into());
+            }
+
+            Ok((*text).as_str().to_owned())
+        })
     }
 
     fn set_contents(&mut self, data: String) -> Result<()> {
