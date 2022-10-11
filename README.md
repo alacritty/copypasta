@@ -13,8 +13,13 @@ use copypasta::{ClipboardContext, ClipboardProvider};
 
 fn main() {
     let mut ctx = ClipboardContext::new().unwrap();
-    println!("{:?}", ctx.get_contents());
-    ctx.set_contents("some string".to_owned()).unwrap();
+
+    let msg = "Hello, world!";
+    ctx.set_contents(msg.to_owned()).unwrap();
+
+    let content = ctx.get_contents().unwrap();
+
+    println!("{}", content);
 }
 ```
 
