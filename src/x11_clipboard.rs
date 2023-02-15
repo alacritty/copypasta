@@ -15,7 +15,7 @@
 use std::marker::PhantomData;
 use std::time::Duration;
 
-use x11_clipboard::xcb::x::Atom;
+use x11_clipboard::Atom;
 use x11_clipboard::{Atoms, Clipboard as X11Clipboard};
 
 use crate::common::*;

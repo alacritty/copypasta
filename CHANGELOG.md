@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Minimum rust version was bumped to `1.60.0`
 
+### Fixed
+
+- `x11_clipboard` was bumped to `0.7.0` droping `quick-xml` from the deps tree
+
+
 ## 0.8.1 
 
 ### Fixed
