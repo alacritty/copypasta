@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use objc::rc::autoreleasepool;
-use objc::runtime::{Class, Object, Sel, BOOL, NO};
-use objc::{msg_send, sel, sel_impl};
+use objc::runtime::{Class, Object, BOOL, NO, YES};
+use objc::{class, msg_send, sel, sel_impl};
 use objc_foundation::{INSArray, INSString};
 use objc_foundation::{NSArray, NSString};
 use objc_id::Id;
@@ -28,7 +28,8 @@ pub struct OSXClipboardContext {
 // required to bring NSPasteboard into the path of the class-resolver
 #[link(name = "AppKit", kind = "framework")]
 extern "C" {
-    pub static NSPasteboardTypeString: Sel;
+    pub static NSPasteboardTypeFileURL: *mut Object;
+    pub static NSPasteboardTypeString: *mut Object;
 }
 
 impl OSXClipboardContext {
@@ -47,14 +48,25 @@ impl ClipboardProvider for OSXClipboardContext {
     fn get_contents(&mut self) -> Result<String> {
         autoreleasepool(|| unsafe {
             let types: *mut NSArray<*mut NSString> = msg_send![self.pasteboard, types];
+            let has_file: BOOL = msg_send![types, containsObject: NSPasteboardTypeFileURL];
             let has_str: BOOL = msg_send![types, containsObject: NSPasteboardTypeString];
 
             if has_str == NO {
                 return Err("NSPasteboard#types doesn't contain NSPasteboardTypeString".into());
             }
 
-            let text: *mut NSString =
-                msg_send![self.pasteboard, stringForType: NSPasteboardTypeString];
+            let text = if has_file == YES {
+                let file_url_string: *mut NSString =
+                    msg_send![self.pasteboard, stringForType: NSPasteboardTypeFileURL];
+                let file_url: *mut Object =
+                    msg_send![class!(NSURL), URLWithString: file_url_string];
+                let text: *mut NSString = msg_send![file_url, path];
+                text
+            } else {
+                let text: *mut NSString =
+                    msg_send![self.pasteboard, stringForType: NSPasteboardTypeString];
+                text
+            };
 
             if text.is_null() {
                 return Err(("NSPasteboard#stringForType returned null").into());

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bump minimum supported Rust version to `1.61.0`
 - Change `ClipboardProvider::set_contents` parameter type to `AsRef<str>`
+- Prefer file's path over text on macOS
 
 ## 0.8.2
 
