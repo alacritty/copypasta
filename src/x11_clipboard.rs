@@ -67,6 +67,10 @@ where
     }
 
     fn set_contents<T: AsRef<str>>(&mut self, data: T) -> Result<()> {
-        Ok(self.0.store(S::atom(&self.0.setter.atoms), self.0.setter.atoms.utf8_string, data.as_ref())?)
+        Ok(self.0.store(
+            S::atom(&self.0.setter.atoms),
+            self.0.setter.atoms.utf8_string,
+            data.as_ref(),
+        )?)
     }
 }
