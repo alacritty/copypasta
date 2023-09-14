@@ -44,8 +44,8 @@ impl ClipboardProvider for Clipboard {
         Ok(self.context.lock().unwrap().load()?)
     }
 
-    fn set_contents(&mut self, data: String) -> Result<()> {
-        self.context.lock().unwrap().store(data);
+    fn set_contents<T: AsRef<str>>(&mut self, data: T) -> Result<()> {
+        self.context.lock().unwrap().store(data.as_ref());
 
         Ok(())
     }
@@ -56,8 +56,8 @@ impl ClipboardProvider for Primary {
         Ok(self.context.lock().unwrap().load_primary()?)
     }
 
-    fn set_contents(&mut self, data: String) -> Result<()> {
-        self.context.lock().unwrap().store_primary(data);
+    fn set_contents<T: AsRef<str>>(&mut self, data: T) -> Result<()> {
+        self.context.lock().unwrap().store_primary(data.as_ref());
 
         Ok(())
     }

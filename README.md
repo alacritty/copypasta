@@ -15,7 +15,7 @@ fn main() {
     let mut ctx = ClipboardContext::new().unwrap();
 
     let msg = "Hello, world!";
-    ctx.set_contents(msg.to_owned()).unwrap();
+    ctx.set_contents(msg).unwrap();
 
     let content = ctx.get_contents().unwrap();
 
@@ -29,7 +29,7 @@ The `ClipboardProvider` trait has the following functions:
 
 ```rust
 fn get_contents(&mut self) -> Result<String, Box<Error>>;
-fn set_contents(&mut self, String) -> Result<(), Box<Error>>;
+fn set_contents<T: AsRef<str>>(&mut self, T) -> Result<(), Box<Error>>;
 ```
 
 `ClipboardContext` is a type alias for one of {`WindowsClipboardContext`, `OSXClipboardContext`, `X11ClipboardContext`, `NopClipboardContext`}, all of which implement `ClipboardProvider`. Which concrete type is chosen for `ClipboardContext` depends on the OS (via conditional compilation).
