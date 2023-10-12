@@ -31,7 +31,7 @@ impl ClipboardProvider for NopClipboardContext {
         Ok("".to_string())
     }
 
-    fn set_contents<T: AsRef<str>>(&mut self, _: T) -> Result<()> {
+    fn set_contents(&mut self, _: String) -> Result<()> {
         println!(
             "Attempting to set the contents of the clipboard, which hasn't yet been implemented \
              on this platform."
