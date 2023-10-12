@@ -29,7 +29,7 @@ impl ClipboardProvider for WindowsClipboardContext {
         Ok(get_clipboard_string()?)
     }
 
-    fn set_contents<T: AsRef<str>>(&mut self, data: T) -> Result<()> {
-        Ok(set_clipboard_string(data.as_ref())?)
+    fn set_contents(&mut self, data: String) -> Result<()> {
+        Ok(set_clipboard_string(&data)?)
     }
 }

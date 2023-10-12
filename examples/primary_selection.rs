@@ -9,7 +9,7 @@ fn main() {
 
     let the_string = "Hello, world!";
 
-    ctx.set_contents(the_string).unwrap();
+    ctx.set_contents(the_string.to_owned()).unwrap();
 }
 
 #[cfg(not(target_os = "linux"))]

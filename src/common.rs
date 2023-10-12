@@ -22,5 +22,5 @@ pub trait ClipboardProvider: Send {
     /// Method to get the clipboard contents as a String
     fn get_contents(&mut self) -> Result<String>;
     /// Method to set the clipboard contents as a String
-    fn set_contents<T: AsRef<str>>(&mut self, _: T) -> Result<()>;
+    fn set_contents(&mut self, _: String) -> Result<()>;
 }
