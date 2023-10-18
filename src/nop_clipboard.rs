@@ -39,3 +39,18 @@ impl ClipboardProvider for NopClipboardContext {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::common::ClipboardProvider;
+    use crate::nop_clipboard::NopClipboardContext;
+
+    #[test]
+    fn it_does_nothing() {
+        let mut ctx = NopClipboardContext::new().unwrap();
+        let msg = "Hello, world!";
+        ctx.set_contents(msg.to_owned()).unwrap();
+
+        assert_eq!(ctx.get_contents().unwrap(), "");
+    }
+}
