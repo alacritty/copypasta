@@ -12,9 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use clipboard_win::{get_clipboard_string, set_clipboard_string};
+use std::error::Error;
+use std::fmt;
+
+use clipboard_win::{get_clipboard_string, set_clipboard_string, SystemError};
 
 use crate::common::{ClipboardProvider, Result};
+
+// Wrap `clipboard_win::SystemError` since it does not implement `Error` trait
+struct WindowsSystemError(SystemError);
+
+impl fmt::Debug for WindowsSystemError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl fmt::Display for WindowsSystemError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl Error for WindowsSystemError {}
 
 pub struct WindowsClipboardContext;
 
@@ -26,10 +46,10 @@ impl WindowsClipboardContext {
 
 impl ClipboardProvider for WindowsClipboardContext {
     fn get_contents(&mut self) -> Result<String> {
-        Ok(get_clipboard_string()?)
+        Ok(get_clipboard_string().map_err(WindowsSystemError)?)
     }
 
     fn set_contents(&mut self, data: String) -> Result<()> {
-        Ok(set_clipboard_string(&data)?)
+        Ok(set_clipboard_string(&data).map_err(WindowsSystemError)?)
     }
 }
