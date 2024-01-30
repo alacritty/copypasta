@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Packaging
 
 - Minimum rust version was bumped to `1.66.0`
+- `x11_clipboard` was bumped to `0.9.1`
 
 ## 0.10.0
 
