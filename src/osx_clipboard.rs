@@ -12,74 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use objc::rc::autoreleasepool;
-use objc::runtime::{Class, Object, BOOL, NO, YES};
-use objc::{class, msg_send, sel, sel_impl};
-use objc_foundation::{INSArray, INSString};
-use objc_foundation::{NSArray, NSString};
-use objc_id::Id;
+use std::panic::RefUnwindSafe;
+use std::panic::UnwindSafe;
+
+use objc2::rc::{autoreleasepool, Id};
+use objc2::runtime::ProtocolObject;
+use objc2::{msg_send_id, ClassType};
+use objc2_app_kit::{NSPasteboard, NSPasteboardTypeFileURL, NSPasteboardTypeString};
+use objc2_foundation::{NSArray, NSString, NSURL};
 
 use crate::common::*;
 
 pub struct OSXClipboardContext {
-    pasteboard: Id<Object>,
+    pasteboard: Id<NSPasteboard>,
 }
 
-// required to bring NSPasteboard into the path of the class-resolver
-#[link(name = "AppKit", kind = "framework")]
-extern "C" {
-    pub static NSPasteboardTypeFileURL: *mut Object;
-    pub static NSPasteboardTypeString: *mut Object;
-}
+unsafe impl Send for OSXClipboardContext {}
+unsafe impl Sync for OSXClipboardContext {}
+impl UnwindSafe for OSXClipboardContext {}
+impl RefUnwindSafe for OSXClipboardContext {}
 
 impl OSXClipboardContext {
     pub fn new() -> Result<OSXClipboardContext> {
-        let cls = Class::get("NSPasteboard").ok_or("Class::get(\"NSPasteboard\")")?;
-        let pasteboard: *mut Object = unsafe { msg_send![cls, generalPasteboard] };
-        if pasteboard.is_null() {
-            return Err("NSPasteboard#generalPasteboard returned null".into());
-        }
-        let pasteboard: Id<Object> = unsafe { Id::from_ptr(pasteboard) };
+        // Use `msg_send_id!` instead of `NSPasteboard::generalPasteboard()`
+        // in the off case that it will return NULL (even though it's
+        // documented not to).
+        let pasteboard: Option<Id<NSPasteboard>> =
+            unsafe { msg_send_id![NSPasteboard::class(), generalPasteboard] };
+        let pasteboard = pasteboard.ok_or("NSPasteboard#generalPasteboard returned null")?;
         Ok(OSXClipboardContext { pasteboard })
     }
 }
 
 impl ClipboardProvider for OSXClipboardContext {
     fn get_contents(&mut self) -> Result<String> {
-        autoreleasepool(|| unsafe {
-            let types: *mut NSArray<*mut NSString> = msg_send![self.pasteboard, types];
-            let has_file: BOOL = msg_send![types, containsObject: NSPasteboardTypeFileURL];
-            let has_str: BOOL = msg_send![types, containsObject: NSPasteboardTypeString];
+        autoreleasepool(|_| {
+            let types = unsafe { self.pasteboard.types() }.unwrap();
+            let has_file = unsafe { types.containsObject(NSPasteboardTypeFileURL) };
+            let has_str = unsafe { types.containsObject(NSPasteboardTypeString) };
 
-            if has_str == NO {
+            if !has_str {
                 return Err("NSPasteboard#types doesn't contain NSPasteboardTypeString".into());
             }
 
-            let text = if has_file == YES {
-                let file_url_string: *mut NSString =
-                    msg_send![self.pasteboard, stringForType: NSPasteboardTypeFileURL];
-                let file_url: *mut Object =
-                    msg_send![class!(NSURL), URLWithString: file_url_string];
-                let text: *mut NSString = msg_send![file_url, path];
-                text
+            let text = if has_file {
+                let file_url_string =
+                    unsafe { self.pasteboard.stringForType(NSPasteboardTypeFileURL) }
+                        .ok_or("NSPasteboard#stringForType returned null")?;
+
+                let file_url = unsafe { NSURL::URLWithString(&file_url_string) }
+                    .ok_or("NSURL#URLWithString returned null")?;
+                unsafe { file_url.path() }.ok_or("NSURL#path returned null")?
             } else {
-                let text: *mut NSString =
-                    msg_send![self.pasteboard, stringForType: NSPasteboardTypeString];
-                text
+                unsafe { self.pasteboard.stringForType(NSPasteboardTypeString) }
+                    .ok_or("NSPasteboard#stringForType returned null")?
             };
 
-            if text.is_null() {
-                return Err(("NSPasteboard#stringForType returned null").into());
-            }
-
-            Ok((*text).as_str().to_owned())
+            Ok(text.to_string())
         })
     }
 
     fn set_contents(&mut self, data: String) -> Result<()> {
-        let string_array = NSArray::from_vec(vec![NSString::from_str(&data)]);
-        let _: usize = unsafe { msg_send![self.pasteboard, clearContents] };
-        let success: bool = unsafe { msg_send![self.pasteboard, writeObjects: string_array] };
+        let string_array =
+            NSArray::from_vec(vec![ProtocolObject::from_id(NSString::from_str(&data))]);
+        unsafe { self.pasteboard.clearContents() };
+        let success = unsafe { self.pasteboard.writeObjects(&string_array) };
         if success {
             Ok(())
         } else {
