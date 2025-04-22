@@ -19,7 +19,7 @@ wayland = ["smithay-clipboard"]
 wayland-dlopen = ["smithay-clipboard/dlopen"]
 
 [target.'cfg(windows)'.dependencies]
-clipboard-win = "3.0.2"
+clipboard-win = { version = "5.4.0", features = ["std"]}
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.5.1"
