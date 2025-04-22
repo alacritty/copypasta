@@ -23,6 +23,6 @@ jobs:
           cargo clippy --all-targets
       - name: Oldstable
         run: |
-          rustup default 1.65.0
+          rustup default 1.71.0
           cargo clean
           cargo test

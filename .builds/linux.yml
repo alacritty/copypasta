@@ -26,5 +26,5 @@ tasks:
       cargo clippy --all-targets
   - oldstable: |
       cd copypasta
-      rustup toolchain install --profile minimal 1.66.0
-      cargo +1.66.0 test
+      rustup toolchain install --profile minimal 1.71.0
+      cargo +1.71.0 test
