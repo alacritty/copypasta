@@ -15,16 +15,16 @@
 use std::panic::RefUnwindSafe;
 use std::panic::UnwindSafe;
 
-use objc2::rc::{autoreleasepool, Id};
+use objc2::rc::{autoreleasepool, Retained};
 use objc2::runtime::ProtocolObject;
-use objc2::{msg_send_id, ClassType};
+use objc2::{msg_send, ClassType};
 use objc2_app_kit::{NSPasteboard, NSPasteboardTypeFileURL, NSPasteboardTypeString};
 use objc2_foundation::{NSArray, NSString, NSURL};
 
 use crate::common::*;
 
 pub struct OSXClipboardContext {
-    pasteboard: Id<NSPasteboard>,
+    pasteboard: Retained<NSPasteboard>,
 }
 
 unsafe impl Send for OSXClipboardContext {}
@@ -37,8 +37,8 @@ impl OSXClipboardContext {
         // Use `msg_send_id!` instead of `NSPasteboard::generalPasteboard()`
         // in the off case that it will return NULL (even though it's
         // documented not to).
-        let pasteboard: Option<Id<NSPasteboard>> =
-            unsafe { msg_send_id![NSPasteboard::class(), generalPasteboard] };
+        let pasteboard: Option<Retained<NSPasteboard>> =
+            unsafe { msg_send![NSPasteboard::class(), generalPasteboard] };
         let pasteboard = pasteboard.ok_or("NSPasteboard#generalPasteboard returned null")?;
         Ok(OSXClipboardContext { pasteboard })
     }
@@ -73,8 +73,9 @@ impl ClipboardProvider for OSXClipboardContext {
     }
 
     fn set_contents(&mut self, data: String) -> Result<()> {
-        let string_array =
-            NSArray::from_vec(vec![ProtocolObject::from_id(NSString::from_str(&data))]);
+        let string_array = NSArray::from_retained_slice(&[ProtocolObject::from_retained(
+            NSString::from_str(&data),
+        )]);
         unsafe { self.pasteboard.clearContents() };
         let success = unsafe { self.pasteboard.writeObjects(&string_array) };
         if success {
