@@ -32,7 +32,14 @@ fn get_contents(&mut self) -> Result<String, Box<Error>>;
 fn set_contents(&mut self, String) -> Result<(), Box<Error>>;
 ```
 
-`ClipboardContext` is a type alias for one of {`WindowsClipboardContext`, `OSXClipboardContext`, `X11ClipboardContext`, `NopClipboardContext`}, all of which implement `ClipboardProvider`. Which concrete type is chosen for `ClipboardContext` depends on the OS (via conditional compilation).
+`ClipboardContext` is a type alias for one of the following types implementing `ClipboardProvider`. Which concrete type is chosen for ClipboardContext depends on the OS(via conditional compilation).
+
+- `WindowsClipboardContext`
+- `AndroidClipboardContext`
+- `OSXClipboardContext`
+- `X11ClipboardContext`
+- `NopClipboardContext`
+
 
 ## License
 
